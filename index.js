@@ -55,15 +55,11 @@ const run = async () => {
       const bookId = req.params.id;
       const comment = req.body.comment;
 
-      console.log(bookId);
-      console.log(comment);
-
       const result = await bookCollection.updateOne(
-        { _id: ObjectId(bookId) },
-        { $push: { comments: comment } }
+        { _id: new ObjectId(bookId) },
+        { $push: { comment: comment } }
       );
 
-      console.log(result);
 
       if (result.modifiedCount !== 1) {
         console.error("Product not found or comment not added");
@@ -79,10 +75,9 @@ const run = async () => {
       const bookId = req.params.id;
 
       const result = await bookCollection.findOne(
-        { _id: ObjectId(bookId) },
-        { projection: { _id: 0, comments: 1 } }
+        { _id: new ObjectId(bookId) },
+        {projection:{_id:0, comment:1}}
       );
-
       if (result) {
         res.json(result);
       } else {
