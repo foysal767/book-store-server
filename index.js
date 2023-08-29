@@ -20,11 +20,11 @@ const run = async () => {
     const db = client.db("book-store");
     const bookCollection = db.collection("books");
 
-    app.get('/recent-book', async(req,res)=>{
-      const cursor = bookCollection.find({}).sort({ _id: -1 })
-      const result = await cursor.limit(10).toArray()
-      res.send({status: true, data: result})
-    })
+    app.get("/recent-book", async (req, res) => {
+      const cursor = bookCollection.find({}).sort({ _id: -1 });
+      const result = await cursor.limit(10).toArray();
+      res.send({ status: true, data: result });
+    });
 
     app.get("/all-books", async (req, res) => {
       const cursor = bookCollection.find({});
@@ -34,20 +34,39 @@ const run = async () => {
 
     app.post("/book", async (req, res) => {
       const book = req.body;
+      console.log(book, "book");
       const result = await bookCollection.insertOne(book);
+      res.send(result);
+    });
+
+    app.patch("/book/:id", async (req, res) => {
+      const id = req.params.id;
+      const book = req.body;
+      console.log(id, book, "book editing");
+      const query = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          title: book?.title,
+          author: book?.author,
+          genre: book?.genre,
+          publication: book?.publication,
+          img: book?.img,
+        },
+      };
+      const result = await bookCollection.updateOne(query, updatedDoc);
       res.send(result);
     });
 
     app.get("/book/:id", async (req, res) => {
       const id = req.params.id;
-      const result = await bookCollection.findOne({ _id: ObjectId(id) });
+      const result = await bookCollection.findOne({ _id: new ObjectId(id) });
       res.send(result);
     });
 
     app.delete("/book/:id", async (req, res) => {
       const id = req.params.id;
 
-      const result = await bookCollection.deleteOne({ _id: ObjectId(id) });
+      const result = await bookCollection.deleteOne({ _id: new ObjectId(id) });
       res.send(result);
     });
 
@@ -59,7 +78,6 @@ const run = async () => {
         { _id: new ObjectId(bookId) },
         { $push: { comment: comment } }
       );
-
 
       if (result.modifiedCount !== 1) {
         console.error("Product not found or comment not added");
@@ -76,7 +94,7 @@ const run = async () => {
 
       const result = await bookCollection.findOne(
         { _id: new ObjectId(bookId) },
-        {projection:{_id:0, comment:1}}
+        { projection: { _id: 0, comment: 1 } }
       );
       if (result) {
         res.json(result);
