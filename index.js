@@ -34,7 +34,6 @@ const run = async () => {
 
     app.post("/book", async (req, res) => {
       const book = req.body;
-      console.log(book, "book");
       const result = await bookCollection.insertOne(book);
       res.send(result);
     });
@@ -42,7 +41,6 @@ const run = async () => {
     app.patch("/book/:id", async (req, res) => {
       const id = req.params.id;
       const book = req.body;
-      console.log(id, book, "book editing");
       const query = { _id: new ObjectId(id) };
       const updatedDoc = {
         $set: {
@@ -80,8 +78,8 @@ const run = async () => {
       );
 
       if (result.modifiedCount !== 1) {
-        console.error("Product not found or comment not added");
-        res.json({ error: "Product not found or comment not added" });
+        console.error("Book not found or comment not added");
+        res.json({ error: "Book not found or comment not added" });
         return;
       }
 
@@ -99,7 +97,7 @@ const run = async () => {
       if (result) {
         res.json(result);
       } else {
-        res.status(404).json({ error: "Product not found" });
+        res.status(404).json({ error: "Book not found" });
       }
     });
   } finally {
